@@ -16,51 +16,63 @@ playerRun = [
         'assets/playerRun/playerRun4.png'), (32, 48))
 ]
 
-playerIdle = [pygame.transform.scale(
-    pygame.image.load('./assets/playerForward.png'), (32, 48))]
+playerIdle = [pygame.transform.scale(pygame.image.load('./assets/playerIdle/playerIdle1.png'), (32, 48)),
+              pygame.transform.scale(pygame.image.load('./assets/playerIdle/playerIdle2.png'), (32, 48))]
 
+playerKeys = {
+    0: [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d],
+    1: [pygame.K_i, pygame.K_j, pygame.K_k, pygame.K_l],
+    2: [pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT],
+    }
 
 class Player():
     def __init__(self):
         self.frame = 0
-        self.image = playerIdle[0]
-        self.animation = self.image
+        self.a = playerIdle[0]
+        self.name = f"Player {random.randint(1, 100)}"
+        self.image = self.a
+        self.playerAnimation = self.image
         self.rect = self.image.get_rect(center=(0, 0))
-        self.position = pygame.math.Vector2(0, 0)
+        self.velocity = pygame.math.Vector2(360, 800)
         self.speed = 1
         self.shot = False
-        self.playerID = lambda: ''.join(random.choices(
-            string.ascii_letters + string.digits, k=5)) 
+        self.id = random.randint(10000, 99999)
+        self.score = 0
 
     def get_id(self):
-        return self.playerID
+        return self.id
+
+    def get_score(self):
+        return self.score
 
     def movement(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w]:
-            self.position[1] -= self.speed
+            self.velocity[1] -= self.speed
         if keys[pygame.K_a]:
-            self.position[0] -= self.speed
+            self.velocity[0] -= self.speed
         if keys[pygame.K_s]:
-            self.position[1] += self.speed
+            self.velocity[1] += self.speed
         if keys[pygame.K_d]:
-            self.position[0] += self.speed
+            self.velocity[0] += self.speed
+        if keys[pygame.K_c]:
+            self.shot = True
 
     def animation(self, display):
 
-        # if self.velocity[0] == 0:
-        #     self.animation = playerIdle
-        #     self.frame += 0.15
-        # if self.velocity[0] != 0:
-        #     self.animation = playerRun
-        #     self.frame += 0.15
-        # if self.frame >= len(self.animation):
-        #     self.frame = 0
+        if self.velocity[0] == 0:
+            self.playerAnimation = playerIdle
+            self.frame += 0.15
+        if self.velocity[0] != 0:
+            self.playerAnimation = playerRun
+            self.frame += 0.15
+        if self.frame >= len(self.playerAnimation):
+            self.frame = 0
 
-        # self.image = self.animation[int(self.frame)]
+        self.image = self.playerAnimation[int(self.frame)]
 
-        display.blit(self.image, (self.position[0], self.position[1]))
+        display.blit(self.image, (self.velocity[0], self.velocity[1]))
 
     def update(self, display):
         self.movement()
